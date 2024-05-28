@@ -334,28 +334,6 @@ class MS2Gen(pl.LightningModule):
         z = z[:, 0, :]  # extract cls token
         z = z.unsqueeze(1)
         
-        # inference mode
-        if mode == "inference":
-            decoder_inputs = torch.tensor(
-                [[self.tokenizer.bos_token_id] for i in range(len(smiles))]
-            ).to(z.device)
-
-            gen = self.decoder_model.generate(
-                decoder_inputs,  # take just bos token for generative task
-                encoder_hidden_states=z,
-                do_sample=True,  
-                max_length=256,
-                temperature=self.temperature,
-                early_stopping=True,
-                pad_token_id=self.tokenizer.pad_token_id,
-                eos_token_id=self.tokenizer.eos_token_id,
-                num_return_sequences=self.num_sequence,
-            )
-            reconstructed_selfies = self.tokenizer.batch_decode(
-                gen, skip_special_tokens=True
-            )
-            return reconstructed_selfies
-
         #otherwise if we are training the model
 
         # pass tokenized inputs through encoder model
